@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Chat AI</title>
+  <!-- <link rel="stylesheet" href="style.css"> -->
+  <!-- <script src="/socket.io/socket.io.js"></script> -->
+  <link rel="stylesheet" type="text/css" href="Semantic-UI-CSS-master/semantic.min.css">
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="Semantic-UI-CSS-master/semantic.min.js"></script>
+   <!-- <style>
+  /* Main chat container */
+    #chat_box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: calc(100vh - 76px);       /* room for the input bar */
+  padding: 16px;
+  overflow-y: auto;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Message bubbles */
+.bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  line-height: 1.4;
+  max-width: min(72%, 680px);        /* wide enough, but not full width */
+  white-space: pre-wrap;             /* keep \n, wrap normally */
+  word-break: normal;                /* don't break inside words */
+  overflow-wrap: anywhere;           /* only break very long tokens */
+}
+
+/* Left (AI) */
+.bubble.ai {
+  background: #f1f1f1;
+  color: #222;
+  margin-right: auto;                /* stick to left */
+  border-bottom-left-radius: 6px;
+}
+
+/* Right (User) */
+.bubble.user {
+  background: #0a7cff;
+  color: #fff;
+  margin-left: auto;                 /* stick to right */
+  border-bottom-right-radius: 6px;
+}
+
+/* Fixed input bar */
+.input-container {
+  position: fixed; left: 0; bottom: 0; width: 100%;
+  display: flex; gap: 8px;
+  padding: 12px 16px;
+  background: #fff; border-top: 1px solid #e5e7eb;
+  box-sizing: border-box;
+}
+.input-container input {
+  flex: 1; padding: 12px 14px;
+  border: 1px solid #d1d5db; border-radius: 999px; outline: none;
+}
+.input-container button {
+  padding: 12px 14px; border: 0; border-radius: 999px;
+  background: #0a7cff; color: #fff; cursor: pointer;
+}
+
+
+   </style> -->
+<!-- <style>
+    /* Main chat container */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 70px); /* leave space for input bar */
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 70px; /* ensures messages are not hidden */
+}
+
+/* Chat messages */
+.message {
+  max-width: 60%;
+  padding: 10px 15px;
+  margin: 8px 0;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* User message (right side) */
+.message.user {
+  background-color: #0078ff;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 5px;
+}
+
+/* AI message (left side) */
+.message.ai {
+  background-color: #f1f1f1;
+  color: #333;
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;          /* Make it full width of parent */
+  max-width: 800px;     /* Optional: fix a max width */
+  height: 50px;         /* Fixed height so size stays same */
+  margin: 0 auto;       /* Center horizontally */
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  padding: 5px 10px;
+  box-sizing: border-box;
+}
+
+.input-container input {
+  flex: 1;              /* Take up remaining space */
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 10px;
+  background: transparent;
+}
+
+.input-container button {
+  border: none;
+  background: #2185d0;
+  color: white;
+  padding: 0 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.input-container button:hover {
+  background: #1678c2;
+}
+</style> -->
+<style>
+    html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Prevent page scroll */
+  font-family: Arial, sans-serif;
+}
+
+/* Full-page wrapper */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 88vh; /* Fill the entire screen */
+}
+
+/* Chat messages area (scrollable only) */
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: #fafafa;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Common message style */
+.message {
+  display: inline-block;       /* Bubble shrinks to text size */
+  padding: 10px 15px;
+  margin: 5px 0;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  max-width: 70%;              /* Prevent very wide bubbles */
+}
+
+/* User message (right side) */
+.message.user {
+  background-color: #0078ff;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 5px;
+  text-align: left;
+}
+
+/* AI message (left side) */
+.message.ai {
+  background-color: #f1f1f1;
+  color: #333;
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+  text-align: left;
+}
+
+/* Input bar (fixed at bottom, never hidden) */
+.input-container {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  border-top: 1px solid #ddd;
+  padding: 5px 10px;
+  background: #fff;
+}
+
+.input-container input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 10px;
+}
+
+.input-container button {
+  border: none;
+  background: #2185d0;
+  color: white;
+  padding: 0 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+    <!-- <button id="startBtn">Start Talking</button>
+    <button id="stopBtn">Stop</button> -->
+    <div class="ui container">
+      <h2>🎤 Voice Chat with AI</h2>
+    <div class="ui segment">
+      <!-- single chat stream -->
+      <div class="app">
+      <div class="chat-container" id="chat"></div>
+  
+      <div class="input-container">
+        <input id="userText" placeholder="Type your question..." />
+        <button class="ui icon button" onclick="sendText()">
+          <i class="ui paper plane icon"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script >
+    const socket = io();
+        let mediaRecorder;
+        let audioCtx;
+
+        // document.getElementById("startBtn").onclick = async () => {
+        // if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        //     alert("Your browser does not support getUserMedia. Use Chrome/Edge/Firefox.");
+        //     return;
+        // }
+
+        // try {
+        //     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        //     mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+
+        //     mediaRecorder.ondataavailable = (event) => {
+        //     if (event.data.size > 0) {
+        //         event.data.arrayBuffer().then(buffer => {
+        //         socket.emit("audio-stream", buffer);
+        //         });
+        //     }
+        //     };
+
+        //     mediaRecorder.start(250);
+        //     document.getElementById("status").innerText = "🎙️ Listening...";
+        // } catch (err) {
+        //     console.error("Mic access error:", err);
+        //     alert("Microphone access denied or unavailable.");
+        // }
+
+        //     const legacyGetUserMedia = navigator.getUserMedia ||
+        //                     navigator.webkitGetUserMedia ||
+        //                     navigator.mozGetUserMedia ||
+        //                     navigator.msGetUserMedia;
+
+        //     if (legacyGetUserMedia) {
+        //     legacyGetUserMedia.call(navigator, { audio: true }, (stream) => {
+        //         const mediaRecorder = new MediaRecorder(stream);
+
+        //         mediaRecorder.ondataavailable = (event) => {
+        //         if (event.data.size > 0) {
+        //             event.data.arrayBuffer().then(buffer => {
+        //             socket.emit("audio-stream", buffer);
+        //             });
+        //         }
+        //         };
+
+        //         mediaRecorder.start(250);
+        //         document.getElementById("status").innerText = "🎙️ Listening...";
+        //     }, (err) => {
+        //         console.error("Mic error:", err);
+        //     });
+        //     } else {
+        //         alert("Your browser does not support microphone capture.");
+        //     }
+        // };
+
+
+        const chat = document.getElementById("chat");
+
+        function addMsg(text, who) {
+        const el = document.createElement("div");
+        el.className = `message ${who}`;
+        el.textContent = text;
+        chat.appendChild(el);
+
+        // auto-scroll to bottom
+        chat.scrollTop = chat.scrollHeight;
+        }
+
+        function sendText() {
+            const input = document.getElementById("userText");
+            const text = input.value.trim();
+            if (!text) return;
+
+            // user bubble
+            addMsg(text, "user");
+
+            // clear input
+            input.value = "";
+            // emit event
+            socket.emit("text-question", text);
+        }
+
+        socket.on("ai-audio", async (audioBuffer, aiResponse) => {
+             
+            if (!audioCtx)
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const buffer = await audioCtx.decodeAudioData(audioBuffer);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+
+            // document.getElementById("status").innerText = "🤖 AI Speaking...";
+
+            // AI bubble
+            addMsg(aiResponse, "ai");
+        });
+  </script>
+</body>
+</html>
