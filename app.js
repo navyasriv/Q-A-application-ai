@@ -22,8 +22,8 @@ const server = https.createServer(options, app);
 app.use(express.static(path.join(__dirname, "public")));
 
 // 🔑 API Keys
-const DEEPGRAM_API_KEY = "07660855da74bd89e9c2bdfb53b1c35c454d2363";
-const GEMINI_API_KEY = "AIzaSyB3WPBBmIjZuoPnU8inHcIkjfExVAZ6U2Y";
+const DEEPGRAM_API_KEY = "tttdfhdfhdhd";
+const GEMINI_API_KEY = "fgcfgdgdgd";
 
 // Gemini Setup
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
